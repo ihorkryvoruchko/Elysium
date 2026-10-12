@@ -34,7 +34,6 @@ const energieVerbrauchList = document.getElementById("energieVerbrauchList")
 const statisticList = document.getElementById("statistik")
 const budget = document.getElementById("budget")
 const filterElemente = []
-let statistik = {}
 
 updateBudget()
 filterByStatus(systeme)
@@ -79,6 +78,7 @@ for (const element of filterElemente) {
 function filterByStatus(systemeList) {
     resetListe(list)
     resetListe(statisticList)
+    let statistik = {}
 
     for (let i = 0; i < systemeList.length; i++) {
         const system = systemeList[i]
