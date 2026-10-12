@@ -78,6 +78,8 @@ list.addEventListener("click", (event) => {
                 statisticUl.appendChild(statisticLi)
             }
 
+            const index = li.dataset.index
+            systeme[index].status = "normal"
             li.classList.remove("kritisch", "gestört")
             li.querySelector("span").textContent = "normal"
         } else {
@@ -105,7 +107,8 @@ function filterByStatus(systemeList) {
 
     let statistik = {}
 
-    for (const system of systemeList) {
+    for (let i = 0; i < systemeList.length; i++) {
+        const system = systemeList[i]
         if (!filterElemente.includes(system.status)) {
             filterElemente.push(system.status)
         }
@@ -115,6 +118,7 @@ function filterByStatus(systemeList) {
         const li = document.createElement("li")
         li.innerHTML = `System: ${system.name}, Status: <span>${system.status}</span> <button class="reparieren">reparieren</button>`
         li.dataset.costen = system.reparaturkosten
+        li.dataset.index = i
 
         if (system.status === "kritisch") {
             li.classList.add("kritisch")
