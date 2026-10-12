@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="main.js" defer></script>
+    <style>
+        ul li {
+            margin-bottom: 10px;
+        }
+        .kritisch {
+            color: red;
+        }
+        .gestört {
+            color: orange;
+        }
+        .reparieren {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <ul class="filter">
+            <select id="filter">
+                <option>alle</option>
+            </select>
+        </ul>
+        <ul id="list"></ul>
+        <h1 id="gesamtenReparaturkosten"></h1>
+        <h3>Statistic:</h3>
+        <ul id="statistik"></ul>
+        <hr>
+        <h2>EnergieVerbrauch List</h2>
+        <ul id="energieVerbrauchList"></ul>
+    </main>
+</body>
+</html>
