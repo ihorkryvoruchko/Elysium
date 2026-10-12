@@ -31,9 +31,10 @@ const list = document.getElementById("list")
 const filter = document.getElementById("filter")
 const gesamtKosten = document.getElementById("gesamtenReparaturkosten")
 const energieVerbrauchList = document.getElementById("energieVerbrauchList")
-const statisticUl = document.getElementById("statistik")
+const statisticList = document.getElementById("statistik")
 const budget = document.getElementById("budget")
 const filterElemente = []
+let statistik = {}
 
 updateBudget()
 filterByStatus(systeme)
@@ -52,36 +53,15 @@ list.addEventListener("click", (event) => {
     if (!button) return;
 
     const li = event.target.parentElement
-
-    let id = li.querySelector("span").textContent
+    const id = li.querySelector("span").textContent
     if (id !== "normal") {
         const costen = Number(li.dataset.costen)
         if (costen <= gesamtBudget) {
-            let newCount = Number(statisticUl.querySelector(`#${id}`).dataset.count) - 1
-            statisticUl.querySelector(`#${id}`).dataset.count = newCount
-            statisticUl.querySelector(`#${id}`).textContent = `${id}: ${newCount}`
             gesamtBudget -= costen
             updateBudget()
-            let newGesamtCosten = Number(gesamtKosten.dataset.costen) - costen
-            gesamtKosten.dataset.costen = newGesamtCosten
-            gesamtKosten.textContent = "Gesamten Reparaturkosten: " + newGesamtCosten + "€"
-
-            if (statisticUl.querySelector(`#normal`)) {
-                let newNormalCount = Number(statisticUl.querySelector(`#normal`).dataset.count) + 1
-                statisticUl.querySelector(`#normal`).dataset.count = newNormalCount
-                statisticUl.querySelector(`#normal`).textContent = `normal: ${newNormalCount}`
-            } else {
-                const statisticLi = document.createElement("li")
-                statisticLi.id = "normal"
-                statisticLi.dataset.count = "1"
-                statisticLi.textContent = `normal: 1`
-                statisticUl.appendChild(statisticLi)
-            }
-
             const index = li.dataset.index
             systeme[index].status = "normal"
-            li.classList.remove("kritisch", "gestört")
-            li.querySelector("span").textContent = "normal"
+            filterByStatus(systeme)
         } else {
             alert("Sie brauchen mehr Geld")
         }
@@ -97,15 +77,8 @@ for (const element of filterElemente) {
 }
 
 function filterByStatus(systemeList) {
-    while (list.hasChildNodes()) {
-        list.removeChild(list.firstChild);
-    }
-
-    while (statisticUl.hasChildNodes()) {
-        statisticUl.removeChild(statisticUl.firstChild);
-    }
-
-    let statistik = {}
+    resetListe(list)
+    resetListe(statisticList)
 
     for (let i = 0; i < systemeList.length; i++) {
         const system = systemeList[i]
@@ -137,7 +110,13 @@ function filterByStatus(systemeList) {
         statisticLi.id = key
         statisticLi.dataset.count = value
         statisticLi.textContent = `${key}: ${value}`
-        statisticUl.appendChild(statisticLi)
+        statisticList.appendChild(statisticLi)
+    }
+}
+
+function resetListe(list) {
+    while (list.hasChildNodes()) {
+        list.removeChild(list.firstChild);
     }
 }
 
