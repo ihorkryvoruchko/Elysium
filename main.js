@@ -1,3 +1,5 @@
+let gesamtBudget = 5000
+
 const systeme = [
     {
         name: "Sauerstoffversorgung",
@@ -30,8 +32,10 @@ const filter = document.getElementById("filter")
 const gesamtKosten = document.getElementById("gesamtenReparaturkosten")
 const energieVerbrauchList = document.getElementById("energieVerbrauchList")
 const statisticUl = document.getElementById("statistik")
+const budget = document.getElementById("budget")
 const filterElemente = []
 
+updateBudget()
 filterByStatus(systeme)
 
 filter.addEventListener("change", (event) => {
@@ -51,24 +55,34 @@ list.addEventListener("click", (event) => {
 
     let id = li.querySelector("span").textContent
     if (id !== "normal") {
-        let newCount = Number(statisticUl.querySelector(`#${id}`).dataset.count) - 1
-        statisticUl.querySelector(`#${id}`).dataset.count = newCount
-        statisticUl.querySelector(`#${id}`).textContent = `${id}: ${newCount}`
+        const costen = Number(li.dataset.costen)
+        if (costen <= gesamtBudget) {
+            let newCount = Number(statisticUl.querySelector(`#${id}`).dataset.count) - 1
+            statisticUl.querySelector(`#${id}`).dataset.count = newCount
+            statisticUl.querySelector(`#${id}`).textContent = `${id}: ${newCount}`
+            gesamtBudget -= costen
+            updateBudget()
+            let newGesamtCosten = Number(gesamtKosten.dataset.costen) - costen
+            gesamtKosten.dataset.costen = newGesamtCosten
+            gesamtKosten.textContent = "Gesamten Reparaturkosten: " + newGesamtCosten + "€"
 
-        if (statisticUl.querySelector(`#normal`)) {
-            let newNormalCount = Number(statisticUl.querySelector(`#normal`).dataset.count) + 1
-            statisticUl.querySelector(`#normal`).dataset.count = newNormalCount
-            statisticUl.querySelector(`#normal`).textContent = `normal: ${newNormalCount}`
+            if (statisticUl.querySelector(`#normal`)) {
+                let newNormalCount = Number(statisticUl.querySelector(`#normal`).dataset.count) + 1
+                statisticUl.querySelector(`#normal`).dataset.count = newNormalCount
+                statisticUl.querySelector(`#normal`).textContent = `normal: ${newNormalCount}`
+            } else {
+                const statisticLi = document.createElement("li")
+                statisticLi.id = "normal"
+                statisticLi.dataset.count = "1"
+                statisticLi.textContent = `normal: 1`
+                statisticUl.appendChild(statisticLi)
+            }
+
+            li.classList.remove("kritisch", "gestört")
+            li.querySelector("span").textContent = "normal"
         } else {
-            const statisticLi = document.createElement("li")
-            statisticLi.id = "normal"
-            statisticLi.dataset.count = "1"
-            statisticLi.textContent = `normal: 1`
-            statisticUl.appendChild(statisticLi)
+            alert("Sie brauchen mehr Geld")
         }
-
-        li.classList.remove("kritisch", "gestört")
-        li.querySelector("span").textContent = "normal"
     }
 })
 
@@ -100,6 +114,7 @@ function filterByStatus(systemeList) {
 
         const li = document.createElement("li")
         li.innerHTML = `System: ${system.name}, Status: <span>${system.status}</span> <button class="reparieren">reparieren</button>`
+        li.dataset.costen = system.reparaturkosten
 
         if (system.status === "kritisch") {
             li.classList.add("kritisch")
@@ -109,7 +124,9 @@ function filterByStatus(systemeList) {
 
         list.appendChild(li)
     }
-    gesamtKosten.innerText = "Gesamten Reparaturkosten: " + systemeList.reduce((total, systemElement) => total + systemElement.reparaturkosten, 0) + "€"
+    const cost = systemeList.reduce((total, systemElement) => total + systemElement.reparaturkosten, 0)
+    gesamtKosten.dataset.costen = cost
+    gesamtKosten.innerText = "Gesamten Reparaturkosten: " + cost + "€"
 
     for (const [key, value] of Object.entries(statistik)) {
         const statisticLi = document.createElement("li")
@@ -118,6 +135,10 @@ function filterByStatus(systemeList) {
         statisticLi.textContent = `${key}: ${value}`
         statisticUl.appendChild(statisticLi)
     }
+}
+
+function updateBudget() {
+    budget.innerText = gesamtBudget
 }
 
 const newListe = systeme.map((element) => `${element.name} ${element.energieverbrauch}`)
